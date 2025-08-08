@@ -2,8 +2,8 @@
 
 import ConicBackground from "@/components/component-x/conic-background";
 import MovingBorder from "@/components/component-x/moving-border";
-import Footer from "@/components/home/footer";
-import Navbar from "@/components/home/navbar";
+import Footer from "@/components/landing/footer";
+import Navbar from "@/components/landing/navbar";
 import { siteConfig } from "@/config/site";
 import { blurInVariant, containerVariant, fadeInVariant } from "@/lib/variants";
 import { motion } from "framer-motion";
