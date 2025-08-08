@@ -1,9 +1,10 @@
 "use server";
 
+import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
 import { db } from "@/lib/db";
 import { createPostSchema } from "@/validations/post";
 import { revalidatePath } from "next/cache";
-import { ValidationError } from "yup";
+import { boolean, ValidationError } from "yup";
 import { getCurrentUser } from "./auth";
 
 export async function createPost(content: string) {
@@ -51,8 +52,23 @@ export async function createPost(content: string) {
   }
 }
 
-export async function getPosts() {
+interface getPostsResponse {
+  success: boolean;
+  posts: PostWithAuthorAndSkeleton[];
+}
+
+export async function getPosts(): Promise<getPostsResponse> {
   try {
+    // 1. Authenticate and get current user
+    const currentUser = await getCurrentUser();
+    console.log("currentUser is ", currentUser);
+    if (!currentUser) {
+      return {
+        success: false,
+        posts: [],
+      };
+    }
+
     const posts = await db.post.findMany({
       orderBy: {
         createdAt: "desc",
@@ -66,14 +82,17 @@ export async function getPosts() {
         },
       },
     });
-    return { success: true, data: posts };
+
+    console.log("posts is ", posts);
+
+    return { success: true, posts };
   } catch (error) {
     console.log("Error fetching posts.");
     if (error instanceof Error) {
       console.log("error.stack is ", error.stack);
       console.log("error.message is ", error.message);
     }
-    return { success: false, message: "Failed to fetch posts.", data: [] };
+    return { success: false, posts: [] };
   }
 }
 
