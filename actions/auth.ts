@@ -17,6 +17,8 @@ import {
   SignUpFormData,
   signUpSchema,
 } from "@/validations/auth";
+import { profileUpdateSchema } from "@/validations/user";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ValidationError } from "yup";
@@ -309,4 +311,68 @@ export async function getCurrentUser() {
     return null;
   }
   return user;
+}
+
+export async function updateUserProfile(
+  formData: FormData
+): Promise<{ success: boolean; message?: string }> {
+  const name = formData.get("name") as string;
+  const bio = formData.get("bio") as string | null;
+
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "You must be logged in to update your profile.",
+      };
+    }
+
+    await profileUpdateSchema.validate({ name, bio }, { abortEarly: false });
+
+    const updateUser = await db.user.update({
+      where: { id: currentUser.id },
+      data: {
+        name: name,
+        bio: bio,
+      },
+    });
+
+    console.log("updatedUser is ", updateUser);
+
+    revalidatePath(`/profile/${currentUser.id}`);
+    revalidatePath("/settings/profile");
+
+    return { success: true, message: "Profile updated successfully!" };
+  } catch (error) {
+    console.log("Error updating profile.");
+    if (error instanceof ValidationError) {
+      return { success: false, message: "Validation failed." };
+    }
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
+    return { success: false, message: "Failed to update profile." };
+  }
+}
+
+export async function getUserById(userId: string) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return null;
+    }
+    const user = await db.user.findUnique({
+      where: { id: userId },
+    });
+    return user;
+  } catch (error) {
+    console.log(`Error fetching user ${userId}`);
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
+    return null;
+  }
 }
