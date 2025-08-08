@@ -24,7 +24,7 @@ export function Navbar({ currentUser }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full shadow-lg">
+    <header className="sticky top-0 z-40 w-full shadow-lg backdrop-blur-lg">
       <div className="container mx-auto flex items-center justify-between py-3 px-2">
         <Link href="/home">
           <div className="flex items-center space-x-2 ">

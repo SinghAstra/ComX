@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/actions/auth";
 import { getPosts } from "@/actions/posts";
 import { Navbar } from "@/components/home/navbar";
 import { redirect } from "next/navigation";
-import { PostFeed } from "./post-feed";
+import { PostFeed } from "../../components/home/post-feed";
 
 export default async function HomePage() {
   const currentUser = await getCurrentUser();
