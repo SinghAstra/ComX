@@ -35,7 +35,7 @@ export function Navbar({ currentUser }: NavbarProps) {
           </div>
         </Link>
         <div className="flex items-center gap-2">
-          <CreatePostForm />
+          <CreatePostForm user={currentUser} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

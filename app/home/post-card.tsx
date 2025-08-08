@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
 import Link from "next/link";
 
@@ -17,26 +16,23 @@ export function PostCard({ post }: PostCardProps) {
   });
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center gap-4 pb-2">
-        <Avatar>
-          <AvatarFallback>
-            {post.author.name.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <Link
-            href={`/profile/${post.author.id}`}
-            className="font-semibold hover:underline"
-          >
+    <div className="w-full border bg-muted/40 px-4 py-2">
+      <Link href={`/profile/${post.author.id}`}>
+        <div className="flex flex-row items-center gap-4 pb-2">
+          <Avatar className="bg-muted/60">
+            <AvatarFallback>
+              {post.author.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <p className="flex flex-col">
             {post.author.name}
-          </Link>
-          <span className="text-sm text-muted-foreground">{formattedDate}</span>
+            <span className="text-sm text-muted-foreground">
+              {formattedDate}
+            </span>
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="text-base">
-        <p>{post.content}</p>
-      </CardContent>
-    </Card>
+      </Link>
+      <p>{post.content}</p>
+    </div>
   );
 }

@@ -4,10 +4,16 @@ import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
 import { db } from "@/lib/db";
 import { createPostSchema } from "@/validations/post";
 import { revalidatePath } from "next/cache";
-import { boolean, ValidationError } from "yup";
+import { ValidationError } from "yup";
 import { getCurrentUser } from "./auth";
 
-export async function createPost(content: string) {
+interface CreatePostResponse {
+  success: boolean;
+  message: string;
+  post?: PostWithAuthorAndSkeleton;
+}
+
+export async function createPost(content: string): Promise<CreatePostResponse> {
   try {
     // 1. Authenticate and get current user
     const currentUser = await getCurrentUser();
@@ -35,7 +41,17 @@ export async function createPost(content: string) {
     revalidatePath("/home");
     revalidatePath(`/profile/${currentUser.id}`);
 
-    return { success: true, message: "Post created successfully!" };
+    return {
+      success: true,
+      message: "Post created successfully!",
+      post: {
+        ...newPost,
+        author: {
+          id: currentUser.id,
+          name: currentUser.name,
+        },
+      },
+    };
   } catch (error) {
     console.log("Error creating post.");
     if (error instanceof ValidationError) {
@@ -52,12 +68,7 @@ export async function createPost(content: string) {
   }
 }
 
-interface getPostsResponse {
-  success: boolean;
-  posts: PostWithAuthorAndSkeleton[];
-}
-
-export async function getPosts(): Promise<getPostsResponse> {
+export async function getPosts() {
   try {
     // 1. Authenticate and get current user
     const currentUser = await getCurrentUser();
@@ -65,6 +76,7 @@ export async function getPosts(): Promise<getPostsResponse> {
     if (!currentUser) {
       return {
         success: false,
+        message: "You must be logged in to fetch posts.",
         posts: [],
       };
     }
@@ -92,7 +104,7 @@ export async function getPosts(): Promise<getPostsResponse> {
       console.log("error.stack is ", error.stack);
       console.log("error.message is ", error.message);
     }
-    return { success: false, posts: [] };
+    return { success: false, message: "Failed to fetch posts.", posts: [] };
   }
 }
 

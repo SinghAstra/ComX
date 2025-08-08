@@ -2,19 +2,30 @@
 
 import { createPost } from "@/actions/posts";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
+import { fetchAllPosts, fetchUserPost } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { User } from "@prisma/client";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useState } from "react";
+import useSWR from "swr";
 import Dialog from "../component-x/dialog";
 import { useToastContext } from "../providers/toast";
 
-export function CreatePostForm() {
+interface CreatePostForm {
+  user: User;
+}
+
+export function CreatePostForm({ user }: CreatePostForm) {
   const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { mutate: mutateAllPosts } =
+    useSWR<PostWithAuthorAndSkeleton[]>(fetchAllPosts);
+  // const { mutate: mutateUserPosts } =
+  //   useSWR<PostWithAuthorAndSkeleton[]>(fetchUserPost);
 
   const { setToastMessage } = useToastContext();
 
@@ -41,16 +52,54 @@ export function CreatePostForm() {
 
     setIsLoading(true);
 
+    const tempPostId = `optimistic-${Date.now()}`;
+    const optimisticPost: PostWithAuthorAndSkeleton = {
+      id: tempPostId,
+      content: content,
+      createdAt: new Date(),
+      authorId: "currentUser",
+      author: {
+        id: user.id,
+        name: user.name,
+      },
+      isSkeleton: true,
+    };
+
+    mutateAllPosts(
+      (currentPosts) => [optimisticPost, ...(currentPosts || [])],
+      false
+    );
+    setShowCreatePostDialog(false);
+
     try {
       const result = await createPost(content);
 
-      if (result.success) {
-        setShowCreatePostDialog(false);
+      mutateAllPosts(
+        (currentPosts) =>
+          currentPosts
+            ? currentPosts.filter((post) => post.id !== tempPostId)
+            : [],
+        false
+      );
+
+      if (result.success && result.post) {
+        mutateAllPosts(
+          (currentPosts) =>
+            currentPosts ? [result.post!, ...currentPosts] : [],
+          false
+        );
         setContent("");
       } else {
         setErrorMessage(result.message);
       }
     } catch (error) {
+      mutateAllPosts(
+        (currentPosts) =>
+          currentPosts
+            ? currentPosts.filter((post) => post.id !== tempPostId)
+            : [],
+        false
+      );
       console.log("Error submitting post");
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);

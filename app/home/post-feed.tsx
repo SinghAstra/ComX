@@ -1,7 +1,7 @@
 "use client";
 
 import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
-import { FETCH_POSTS_KEY } from "@/lib/constants";
+import { fetchAllPosts } from "@/lib/constants";
 import useSWR from "swr";
 import { PostCard } from "./post-card";
 
@@ -10,7 +10,7 @@ interface PostFeedProps {
 }
 
 export function PostFeed({ initialPosts }: PostFeedProps) {
-  const { data: posts } = useSWR<PostWithAuthorAndSkeleton[]>(FETCH_POSTS_KEY, {
+  const { data: posts } = useSWR<PostWithAuthorAndSkeleton[]>(fetchAllPosts, {
     fallbackData: initialPosts,
   });
 
