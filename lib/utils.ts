@@ -15,5 +15,6 @@ export const fetcher = async (key: string) => {
     }
     return result.posts;
   }
+
   throw new Error(`Unknown SWR key: ${key}`);
 };
