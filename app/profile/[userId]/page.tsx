@@ -6,15 +6,15 @@ import { notFound, redirect } from "next/navigation";
 import { UserProfileCard } from "./user-profile-card";
 
 interface UserProfilePageProps {
-  params: {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 }
 
 export default async function UserProfilePage({
   params,
 }: UserProfilePageProps) {
-  const { userId } = params;
+  const { userId } = await params;
 
   const currentUser = await getCurrentUser();
   if (!currentUser) {
