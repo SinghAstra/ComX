@@ -1,12 +1,10 @@
 import { getCurrentUser } from "@/actions/auth";
-import { getPosts } from "@/actions/posts";
 import { Navbar } from "@/components/home/navbar";
-import { PostFeed } from "@/components/home/post-feed";
 import { redirect } from "next/navigation";
+import { EditProfileForm } from "./edit-profile-form";
 
-export default async function HomePage() {
+export default async function SettingsProfilePage() {
   const currentUser = await getCurrentUser();
-  const { posts } = await getPosts();
 
   if (!currentUser) {
     redirect("/login");
@@ -15,8 +13,9 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar currentUser={currentUser} />
-      <main className="px-4 py-8 w-full max-w-2xl mx-auto">
-        <PostFeed initialPosts={posts} />
+      <main className="w-full mx-auto px-4 py-8 max-w-2xl">
+        <h1 className="text-3xl font-bold mb-6">Profile Settings</h1>
+        <EditProfileForm currentUser={currentUser} />
       </main>
     </div>
   );

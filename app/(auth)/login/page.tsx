@@ -16,7 +16,7 @@ import * as yup from "yup";
 
 function LoginPage() {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: "singhisabhaypratap@gmail.com",
+    email: "",
     password: "",
   });
   const [errors, setErrors] = useState<

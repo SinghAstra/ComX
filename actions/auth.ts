@@ -314,11 +314,9 @@ export async function getCurrentUser() {
 }
 
 export async function updateUserProfile(
-  formData: FormData
+  name: string,
+  bio: string
 ): Promise<{ success: boolean; message?: string }> {
-  const name = formData.get("name") as string;
-  const bio = formData.get("bio") as string | null;
-
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {

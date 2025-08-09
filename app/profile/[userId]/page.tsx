@@ -33,7 +33,7 @@ export default async function UserProfilePage({
   return (
     <div className="min-h-screen bg-background">
       <Navbar currentUser={currentUser} />
-      <main className="px-4 py-8 space-y-8">
+      <main className="px-4 py-8 space-y-8 w-full max-w-2xl mx-auto">
         <UserProfileCard user={profileUser} isCurrentUser={isCurrentUser} />
 
         <div>

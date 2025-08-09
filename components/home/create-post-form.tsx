@@ -4,7 +4,7 @@ import { createPost } from "@/actions/posts";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
-import { fetchAllPosts, fetchUserPost } from "@/lib/constants";
+import { fetchAllPosts } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { User } from "@prisma/client";
 import { Loader2, PlusIcon } from "lucide-react";
@@ -24,8 +24,6 @@ export function CreatePostForm({ user }: CreatePostForm) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { mutate: mutateAllPosts } =
     useSWR<PostWithAuthorAndSkeleton[]>(fetchAllPosts);
-  // const { mutate: mutateUserPosts } =
-  //   useSWR<PostWithAuthorAndSkeleton[]>(fetchUserPost);
 
   const { setToastMessage } = useToastContext();
 

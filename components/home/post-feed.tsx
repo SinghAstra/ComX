@@ -23,7 +23,7 @@ export function PostFeed({ initialPosts }: PostFeedProps) {
   }
 
   return (
-    <div className="space-y-4 max-w-2xl w-full mx-auto">
+    <div className="space-y-4 w-full">
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
