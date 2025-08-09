@@ -4,7 +4,7 @@ import { createPost } from "@/actions/posts";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PostWithAuthorAndSkeleton } from "@/interfaces/post";
-import { fetchAllPosts } from "@/lib/constants";
+import { fetchAllPosts, fetchAllUserPosts } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { User } from "@prisma/client";
 import { Loader2, PlusIcon } from "lucide-react";
@@ -24,6 +24,8 @@ export function CreatePostForm({ user }: CreatePostForm) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { mutate: mutateAllPosts } =
     useSWR<PostWithAuthorAndSkeleton[]>(fetchAllPosts);
+  const { mutate: mutateAllUserPosts } =
+    useSWR<PostWithAuthorAndSkeleton[]>(fetchAllUserPosts);
 
   const { setToastMessage } = useToastContext();
 
@@ -67,12 +69,23 @@ export function CreatePostForm({ user }: CreatePostForm) {
       (currentPosts) => [optimisticPost, ...(currentPosts || [])],
       false
     );
+    mutateAllUserPosts(
+      (currentPosts) => [optimisticPost, ...(currentPosts || [])],
+      false
+    );
     setShowCreatePostDialog(false);
 
     try {
       const result = await createPost(content);
 
       mutateAllPosts(
+        (currentPosts) =>
+          currentPosts
+            ? currentPosts.filter((post) => post.id !== tempPostId)
+            : [],
+        false
+      );
+      mutateAllUserPosts(
         (currentPosts) =>
           currentPosts
             ? currentPosts.filter((post) => post.id !== tempPostId)
@@ -86,12 +99,24 @@ export function CreatePostForm({ user }: CreatePostForm) {
             currentPosts ? [result.post!, ...currentPosts] : [],
           false
         );
+        mutateAllUserPosts(
+          (currentPosts) =>
+            currentPosts ? [result.post!, ...currentPosts] : [],
+          false
+        );
         setContent("");
       } else {
         setErrorMessage(result.message);
       }
     } catch (error) {
       mutateAllPosts(
+        (currentPosts) =>
+          currentPosts
+            ? currentPosts.filter((post) => post.id !== tempPostId)
+            : [],
+        false
+      );
+      mutateAllUserPosts(
         (currentPosts) =>
           currentPosts
             ? currentPosts.filter((post) => post.id !== tempPostId)
