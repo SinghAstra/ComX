@@ -1,7 +1,7 @@
 import { getCurrentUser, getUserById } from "@/actions/auth";
 import { getUserPosts } from "@/actions/posts";
 import { Navbar } from "@/components/home/navbar";
-import { PostFeed } from "@/components/home/post-feed";
+import { UserPosts } from "@/components/home/user-posts";
 import { notFound, redirect } from "next/navigation";
 import { UserProfileCard } from "./user-profile-card";
 
@@ -40,7 +40,7 @@ export default async function UserProfilePage({
           <h2 className="text-2xl font-bold mb-4">
             {isCurrentUser ? "Your Posts" : `${profileUser.name}'s Posts`}
           </h2>
-          <PostFeed initialPosts={userPosts || []} />
+          <UserPosts initialPosts={userPosts || []} />
         </div>
       </main>
     </div>
