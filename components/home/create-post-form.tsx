@@ -57,7 +57,7 @@ export function CreatePostForm({ user }: CreatePostForm) {
       id: tempPostId,
       content: content,
       createdAt: new Date(),
-      authorId: "currentUser",
+      authorId: user.id,
       author: {
         id: user.id,
         name: user.name,
@@ -78,20 +78,8 @@ export function CreatePostForm({ user }: CreatePostForm) {
     try {
       const result = await createPost(content);
 
-      mutateAllPosts(
-        (currentPosts) =>
-          currentPosts
-            ? currentPosts.filter((post) => post.id !== tempPostId)
-            : [],
-        false
-      );
-      mutateAllUserPosts(
-        (currentPosts) =>
-          currentPosts
-            ? currentPosts.filter((post) => post.id !== tempPostId)
-            : [],
-        false
-      );
+      mutateAllPosts();
+      mutateAllUserPosts();
 
       if (result.success && result.post) {
         mutateAllPosts(
@@ -109,20 +97,8 @@ export function CreatePostForm({ user }: CreatePostForm) {
         setErrorMessage(result.message);
       }
     } catch (error) {
-      mutateAllPosts(
-        (currentPosts) =>
-          currentPosts
-            ? currentPosts.filter((post) => post.id !== tempPostId)
-            : [],
-        false
-      );
-      mutateAllUserPosts(
-        (currentPosts) =>
-          currentPosts
-            ? currentPosts.filter((post) => post.id !== tempPostId)
-            : [],
-        false
-      );
+      mutateAllPosts();
+      mutateAllUserPosts();
       console.log("Error submitting post");
       if (error instanceof Error) {
         console.log("error.stack is ", error.stack);
